@@ -1,6 +1,8 @@
 mock-spawn
 ==========
 
+[![Build Status](https://secure.travis-ci.org/gotwarlost/mock-spawn.png)](http://travis-ci.org/gotwarlost/mock-spawn)
+
 An easy-to-use mock for `child_process.spawn`.
 
 ### Key ideas

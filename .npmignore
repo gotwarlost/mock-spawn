@@ -1,0 +1,5 @@
+examples/
+run-tests.sh
+.npmignore
+.travis.yml
+

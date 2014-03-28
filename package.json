@@ -1,0 +1,29 @@
+{
+    "name": "mock-spawn",
+    "description": "A mock for child_process.spawn",
+    "version": "0.2.1",
+    "keywords": [ "child_process", "child process", "spawn", "mock" ],
+    "author": "Krishnan Anantheswaran <kananthmail-github@yahoo.com>",
+    "contributors": [],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/gotwarlost/mock-spawn.git"
+    },
+    "scripts": {
+        "pretest": "jshint --config ./jshint.json index.js examples/simple/*js examples/complete/*js",
+        "test": "./run-tests.sh"
+    },
+    "dependencies": {
+        "through": "2.3.x"
+    },
+    "devDependencies": {
+        "async": "0.2.x",
+        "mockery": "1.4.x",
+        "mocha": "1.x",
+        "istanbul": "0.x",
+        "jshint": "2.4.x"
+    },
+    "license": "BSD"
+}
+
+

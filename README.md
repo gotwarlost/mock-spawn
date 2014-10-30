@@ -48,13 +48,24 @@ mySpawn.sequence.add(mySpawn.simple(1));
 mySpawn.sequence.add(function (cb) {
     setTimeout(function () { return cb(2); }, 2000);
 });
+mySpawn.sequence.add(function (cb) {
+    // test the error handling of your library
+    this.emit('error', new Error('spawn ENOENT');
+    setTimeout(function() { return cb(8); }, 10);
+});
+mySpawn.sequence.add({throws:new Error('spawn ENOENT')});
 
 // the fourth call to spawn will use the default function we set up to exit 1
+
+// the fifth call to spawn will emit an error and emit exit with code 8 on the
+// next tick of the event loop
+
+// the sixth call to spawn will throw an error synchronously
 
 // call your test library here that invokes spawn the way you expect it to
 lib.doSomething(function (err) {
     /* after the test is done running, you can make assertions like so */
-    assert.equal(4, mySpawn.calls.length);
+    assert.equal(6, mySpawn.calls.length);
     var firstCall = mySpawn.calls[0];
     assert.equal('ls', firstCall.command);
     assert.deepEqual([ '-l' ], firstCall.args);
@@ -95,7 +106,11 @@ mySpawn.setStrategy(function (command, args, opts) {
 #### The runner function
 
 The runner function accepts a single callback that needs to be called with an
-exit code and optionally a signal name.
+exit code and optionally a signal name. If you define a `throws` property on
+the runner object, it will throw that error synchronously to mimic the
+behavior of `child_process.spawn`. It will ignore everything else in this case,
+and it will not "run" at all. 
+**CAVEAT**: The `throws` value *must* be an instanceof `Error`.
 
 The runner function has access to the following attributes via `this`
 * `this.stdout` - the standard output of the process to which it can write
@@ -103,6 +118,7 @@ The runner function has access to the following attributes via `this`
 * `this.command` - the command for the `spawn` call
 * `this.args` - the args for the `spawn` call
 * `this.opts` - the options object passed to the `spawn` call
+* `this.emit` - the emit method of the underlying `EventEmitter`
 
 The process "runs" until the runner calls the callback.
 

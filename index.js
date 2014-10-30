@@ -1,3 +1,4 @@
+'use strict';
 /*
 Copyright 2014 Yahoo! Inc. All rights reserved.
 Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
@@ -32,7 +33,8 @@ function MockProcess(runner) {
 util.inherits(MockProcess, EventEmitter);
 
 MockProcess.prototype._start = function (command, args, opts) {
-    var that = this;
+    var that = this,
+        runner = this._runner;
 
     this.command = command;
     this.args = args;
@@ -40,8 +42,10 @@ MockProcess.prototype._start = function (command, args, opts) {
     this.pid = lastPid;
     lastPid += 1;
 
+    if(runner.throws instanceof Error){
+        throw runner.throws;
+    }
     process.nextTick(function () {
-        var runner = that._runner;
         runner.call(that, function (exitCode, signal) {
             that.exitCode = exitCode;
             if (signal) {
@@ -146,7 +150,7 @@ module.exports = function (verbose) {
 
     main.__defineGetter__('sequence', function () { return pm.sequence; });
     main.__defineGetter__('calls', function () { return pm.calls.slice(); });
-    main.setDefault = function (fn) { pm.defaultFn  = fn; };
+    main.setDefault = function (fn) { pm.defaultFn = fn; };
     main.setStrategy = function (s) { pm.setStrategy(s); };
     main.simple = function (exitCode, stdout, stderr) {
         return ezRunner(exitCode, stdout, stderr).setVerbose(verbose);

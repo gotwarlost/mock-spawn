@@ -14,6 +14,7 @@ var assert = require('assert'),
     lib;
 
 describe('mock-spawn', function () {
+    'use strict';
 
     beforeEach(function () {
         var verbose = false; // make it true to see additional verbose output
@@ -117,6 +118,34 @@ describe('mock-spawn', function () {
                 assert.equal('foo2', spawn.calls[1].command);
                 assert.deepEqual(spawn.calls[1].args, ['bar', 'baz' ]);
                 assert.equal(2, spawn.calls[1].exitCode);
+                done();
+            });
+        });
+
+        it('allows you to emit an error event at runtime', function(done) {
+            var cbcalled = false;
+            spawn.sequence.add(function(cb){
+                this.emit('error',new Error('spawn ENOENT'));
+                process.nextTick(function(){
+                    cb(-1);
+                    cbcalled = true;
+                });
+            });
+            lib.run('foo', ['', ''], function(err){
+                assert.ok(!!err);
+                assert(!cbcalled);
+                assert.equal(err.message,'spawn ENOENT');
+                done();
+            });
+        });
+
+        it('allows you to throw an error during spawn', function(done) {
+            var cbcalled = false, fn = {throws : new Error('spawn ENOENT')};
+            spawn.sequence.add(fn);
+            lib.run('foo', ['', ''], function(err){
+                assert.ok(!!err);
+                assert(!cbcalled);
+                assert.equal(err.message,'spawn ENOENT');
                 done();
             });
         });

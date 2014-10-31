@@ -13,3 +13,5 @@ branches:
   except:
     - gh-pages
 
+before_install:
+    - if [[ `node --version` == *v0.8* ]]; then npm install -g npm; fi

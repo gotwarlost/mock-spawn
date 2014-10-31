@@ -1,10 +1,12 @@
 {
     "name": "mock-spawn",
     "description": "A mock for child_process.spawn",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "keywords": [ "child_process", "child process", "spawn", "mock" ],
     "author": "Krishnan Anantheswaran <kananthmail-github@yahoo.com>",
-    "contributors": [],
+    "contributors": [
+        "Greg Cochard <greg.cochard@gmail.com>"
+    ],
     "repository": {
         "type": "git",
         "url": "git://github.com/gotwarlost/mock-spawn.git"

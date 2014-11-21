@@ -98,7 +98,7 @@ function makeSeq(verbose) {
                         ' remaining functions');
                 }
                 runner = runners.shift();
-            } else {
+            } else if (verbose) {
                 console.log('No runners left, using default');
             }
             return runner;

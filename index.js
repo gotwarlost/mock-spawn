@@ -8,24 +8,35 @@ Copyrights licensed under the New BSD License. See the accompanying LICENSE file
 var util = require('util'),
     EventEmitter = require('events').EventEmitter,
     through = require('through'),
+    stream = require('stream'),
     lastPid = 1;
 
 function MockProcess(runner) {
-    var that = this;
+    var that = this,
+        streamer = function () {
+            return stream.PassThrough ? new stream.PassThrough() : through();
+        },
+        emitted = false,
+        emitter = function () {
+            if (!emitted) {
+                emitted = true;
+                that.emit('close', that.exitCode, that.signal);
+            }
+        };
     EventEmitter.call(this);
-    this.stdin = through();
-    this.stdout = through();
-    this.stderr = through();
-    this.stderr.on('close', function () {
-        that.emit('close', that.exitCode, that.signal);
-    });
+    this.stdin = streamer();
+    this.stdout = streamer();
+    this.stderr = streamer();
+
+    this.stderr.on('end', emitter);
+    this.stderr.on('close', emitter);
+
     /* istanbul ignore next - polyfill */
     if (!this.stdout.setEncoding) {
         this.stdout.setEncoding = this.stderr.setEncoding = function (encoding) {
             this.encoding = encoding;
         };
     }
-
     this._runner = runner;
     this.signal = null;
 }
@@ -79,7 +90,9 @@ var ezRunner = function (exitCode, stdout, stderr) {
             if (stderr) {
                 this.stderr.write(stderr);
             }
-            return cb(exitCode);
+            process.nextTick(function () {
+                return cb(exitCode);
+            });
         };
     fn.setVerbose = function (v) {
         verbose = !!v;

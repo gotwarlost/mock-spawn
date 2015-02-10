@@ -71,13 +71,13 @@ describe('mock-spawn', function () {
                 //`command`, `args` and `opts` available via `this`
                 assert.ok('foo2', this.command);
                 this.data = 'XXX';
-                return cb(0, 'SIGKILL'); //0 is the exit code, SIGKILL the signal
+                return cb(0); //0 is the exit code
             });
             //set up defaults to exit 1 always
             spawn.setDefault(spawn.simple(1));
             async.series([
-                function (next) { lib.run('foo', [ 'bar', 'baz'], next); },
-                function (next) { lib.run('foo2', [ 'bar', 'baz'], next); },
+                function (next) { lib.run('foo',  ['bar', 'baz'], next); },
+                function (next) { lib.run('foo2', ['bar', 'baz'], next); },
                 function (next) { lib.run('foo3', ['bar', 'baz'], next); }
             ], function (err) {
                 assert.ok(!!err);
@@ -148,6 +148,32 @@ describe('mock-spawn', function () {
                 assert.equal(err.message,'spawn ENOENT');
                 done();
             });
+        });
+
+        it('allows you to register signal behaviors', function(done) {
+            var signal = 'SIGTERM', proc;
+            spawn.setSignals({SIGTERM:true,SIGINT:false});
+            spawn.sequence.add(function(cb){
+                setTimeout(cb,5000);
+            });
+            proc = lib.run('foo', ['', ''], function(err){
+                assert.equal(err.message,signal);
+                done();
+            });
+            proc.kill(signal);
+        });
+
+        it('lets you define a signal handler that does not kill the process', function(done) {
+            var signal = 'SIGINT', proc;
+            spawn.setSignals({SIGTERM:true,SIGINT:false});
+            spawn.sequence.add(function(cb){
+                setTimeout(cb.bind(null,0),50);
+            });
+            proc = lib.run('foo', ['', ''], function(err){
+                assert.equal(err,null);
+                done();
+            });
+            proc.kill(signal);
         });
     });
 });

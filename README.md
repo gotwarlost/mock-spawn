@@ -173,6 +173,13 @@ sets `fn` as the strategy that will return runner functions on demand.
 
 Do **not** mix `sequence.add` and `setStrategy` calls for a specific run.
 
+#### mySpawn.setSignals(obj)
+
+sets `obj` as a lookup table for whether to exit. If the value is `true`,
+then the runner will emit `exit` with code `null` and signal `<signal>`.
+
+* obj - the object with signal names and whether to exit.
+
 #### mySpawn.calls
 
 array of mock process objects that you can use to inspect how your library
@@ -199,6 +206,6 @@ The following third-party libraries are used by this module:
 Pull requests welcome!
 
  * `child_process.fork` and `child_process.exec` processing
- * reasonable behavior on `process.kill`
+ * strategy functions on `process.kill`
 
 

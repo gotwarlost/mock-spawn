@@ -17,9 +17,12 @@ module.exports = {
         proc.stdout.setEncoding('utf8');
         proc.stdout.on('data', function (d) { console.log(d); });
         proc.stderr.on('data', function (d) { console.error(d); });
-        proc.on('exit', function (code) {
+        proc.on('exit', function (code, sig) {
             if(!cbCalled){
                 cbCalled = true;
+                if(sig){
+                    return cb(new Error(sig));
+                }
                 return cb(code === 0 ? null : new Error('Command exited: ' + code));
             }
         });
@@ -29,5 +32,6 @@ module.exports = {
                 return cb(e);
             }
         });
+        return proc;
     }
 };

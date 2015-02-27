@@ -3,11 +3,7 @@ language: node_js
 node_js:
   - "0.8"
   - "0.10"
-  - "0.11"
-
-matrix:
-  allow_failures:
-    - node_js: "0.11"
+  - "0.12"
 
 branches:
   except:
@@ -15,3 +11,8 @@ branches:
 
 before_install:
     - if [[ `node --version` == *v0.8* ]]; then npm install -g npm; fi
+
+sudo: false
+cache:
+  directories:
+    - node_modules

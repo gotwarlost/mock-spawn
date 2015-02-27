@@ -11,9 +11,10 @@ var util = require('util'),
     stream = require('stream'),
     lastPid = 1;
 
-function MockProcess(runner) {
+function MockProcess(runner, signals) {
     var that = this,
         streamer = function () {
+            /* istanbul ignore next - fallback */
             return stream.PassThrough ? new stream.PassThrough() : through();
         },
         emitted = false,
@@ -39,6 +40,9 @@ function MockProcess(runner) {
     }
     this._runner = runner;
     this.signal = null;
+    if(signals){
+        this.signals = signals;
+    }
 }
 
 util.inherits(MockProcess, EventEmitter);
@@ -51,27 +55,41 @@ MockProcess.prototype._start = function (command, args, opts) {
     this.args = args;
     this.opts = opts;
     this.pid = lastPid;
+    this.ended = false;
     lastPid += 1;
 
     if(runner.throws instanceof Error){
         throw runner.throws;
     }
     process.nextTick(function () {
-        runner.call(that, function (exitCode, signal) {
-            that.exitCode = exitCode;
-            if (signal) {
-                that.signal = signal;
+        runner.call(that, function (exitCode) {
+            if(!that.ended){
+                that.ended = true;
+                that.exitCode = exitCode;
+                that.emit('exit', exitCode);
+                that.stdout.end();
+                that.stderr.end();
             }
-            that.emit('exit', exitCode, that.signal);
-            that.stdout.end();
-            that.stderr.end();
         });
     });
     return this;
 };
 
 MockProcess.prototype.kill = function (signal) {
-    this.signal = signal; //need to do something better here
+    var that = this;
+    // if the signals object contains this signal and is *truthy*, and it is still running, exit
+    if(this.signals[signal]){
+        this.signal = signal;
+        /* istanbul ignore else - no-op if ended */
+        if(!this.ended){
+            this.ended = true;
+            process.nextTick(function(){
+                that.emit('exit',null,signal);
+                that.stdout.end();
+                that.stderr.end();
+            });
+        }
+    }
 };
 
 var ezRunner = function (exitCode, stdout, stderr) {
@@ -135,6 +153,10 @@ ProcessList.prototype.setStrategy = function (strategy) {
     this.strategy = strategy;
 };
 
+ProcessList.prototype.setSignals = function (sigs) {
+    this.signals = sigs;
+};
+
 ProcessList.prototype.next = function (command, args, opts) {
     var runner,
         mp;
@@ -143,7 +165,7 @@ ProcessList.prototype.next = function (command, args, opts) {
         runner = this.strategy(command, args, opts);
     }
     runner = runner || this.defaultFn;
-    mp = new MockProcess(runner);
+    mp = new MockProcess(runner,this.signals);
     this.calls.push(mp);
     return mp._start(command, args, opts);
 };
@@ -168,6 +190,7 @@ module.exports = function (verbose) {
     main.simple = function (exitCode, stdout, stderr) {
         return ezRunner(exitCode, stdout, stderr).setVerbose(verbose);
     };
+    main.setSignals = function (sigs) { pm.setSignals(sigs); };
 
     return main;
 };

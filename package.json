@@ -1,7 +1,7 @@
 {
     "name": "mock-spawn",
     "description": "A mock for child_process.spawn",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "keywords": [ "child_process", "child process", "spawn", "mock" ],
     "author": "Krishnan Anantheswaran <kananthmail-github@yahoo.com>",
     "contributors": [

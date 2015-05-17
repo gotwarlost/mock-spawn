@@ -1,11 +1,12 @@
 {
     "name": "mock-spawn",
     "description": "A mock for child_process.spawn",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "keywords": [ "child_process", "child process", "spawn", "mock" ],
     "author": "Krishnan Anantheswaran <kananthmail-github@yahoo.com>",
     "contributors": [
-        "Greg Cochard <greg.cochard@gmail.com>"
+        "Greg Cochard <greg.cochard@gmail.com>",
+        "Shay Erlichmen @erlichmen"
     ],
     "repository": {
         "type": "git",

@@ -61,6 +61,7 @@ MockProcess.prototype._start = function (command, args, opts) {
     if(runner.throws instanceof Error){
         throw runner.throws;
     }
+    this.stdin.pause();
     process.nextTick(function () {
         runner.call(that, function (exitCode) {
             if(!that.ended){
@@ -71,6 +72,7 @@ MockProcess.prototype._start = function (command, args, opts) {
                 that.stderr.end();
             }
         });
+        that.stdin.resume();
     });
     return this;
 };

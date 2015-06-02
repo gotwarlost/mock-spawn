@@ -30,6 +30,7 @@ function MockProcess(runner, signals) {
     this.stderr = streamer();
 
     this.stderr.on('end', emitter);
+    this.stderr.on('finish', emitter);
     this.stderr.on('close', emitter);
 
     /* istanbul ignore next - polyfill */

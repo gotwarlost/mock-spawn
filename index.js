@@ -77,6 +77,7 @@ MockProcess.prototype._start = function (command, args, opts) {
 };
 
 MockProcess.prototype.kill = function (signal) {
+    signal = signal || 'SIGTERM';
     var that = this;
     // if the signals object contains this signal and is *truthy*, and it is still running, exit
     if(this.signals[signal]){

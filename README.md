@@ -50,7 +50,7 @@ mySpawn.sequence.add(function (cb) {
 });
 mySpawn.sequence.add(function (cb) {
     // test the error handling of your library
-    this.emit('error', new Error('spawn ENOENT');
+    this.emit('error', new Error('spawn ENOENT'));
     setTimeout(function() { return cb(8); }, 10);
 });
 mySpawn.sequence.add({throws:new Error('spawn ENOENT')});

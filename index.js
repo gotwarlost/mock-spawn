@@ -76,7 +76,7 @@ MockProcess.prototype._start = function (command, args, opts) {
     return this;
 };
 
-MockProcess.prototype.unref = function () { return this; }
+MockProcess.prototype.unref = function () { return this; };
 
 MockProcess.prototype.kill = function (signal) {
     signal = signal || 'SIGTERM';

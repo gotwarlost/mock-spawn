@@ -1,7 +1,6 @@
-import { SpawnOptions } from 'child_process';
-import { EventEmitter } from 'events';
-
 declare module 'mock-spawn' {
+  import { SpawnOptions } from 'child_process';
+  import { EventEmitter } from 'events';
   /**
    * Returns a function that can be plugged into `child_process` as a replacement for `spawn`.
    *
@@ -12,11 +11,9 @@ declare module 'mock-spawn' {
 
   interface Runner {
     /**
-     * Creates a new `Runner` which calls `cb` when finished.
-     *
-     * @returns A new Runner.
+     * Runs the sequence code calling `cb` when it is done.
      */
-    (cb: (exitCode: number) => void): Runner;
+    (cb: (exitCode: number) => void): void;
 
     /**
      * A chainable function that sets the verbosity of the `Runner`.
@@ -27,7 +24,7 @@ declare module 'mock-spawn' {
      * @param verbose - True to see additional debug messages from this library.
      * @returns the chained Runner.
      */
-    setVerbose(verbose: boolean): Runner;
+    setVerbose?(verbose: boolean): Runner;
   }
 
   interface Strategy {
@@ -43,20 +40,21 @@ declare module 'mock-spawn' {
      *
      * @param fn - The runner function to use. The nth call to `add` plugs a runner function for the nth invocation to `spawn`.
      */
-    add(fn: Runner): void;
+    add(fn: Runner | { throws: Error }): void;
   }
 
-  type Signals = {
+  interface Signals {
     [signal: string]: boolean;
-  };
+  }
 
+  /* eslint-disable require-jsdoc */
   class MockProcess extends EventEmitter {
-    constructor(runner: Runner, signals: Signals);
-    command: string;
-    args: string[];
-    opts: SpawnOptions;
-    exitCode: number;
-    signal: string;
+    public constructor(runner: Runner, signals: Signals);
+    public command: string;
+    public args: string[];
+    public opts: SpawnOptions;
+    public exitCode: number;
+    public signal: string;
   }
 
   interface Main {
